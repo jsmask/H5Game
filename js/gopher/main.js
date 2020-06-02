@@ -1,16 +1,16 @@
-
 /**
  * @link https://github.com/jsmask
  * @author JSMask
  */
+
 var game = (function() {
 
-	var stateType = {
-		DEFAULT: "default",
-		READY: "ready",
-		START: "start",
-		OVER: "over"
-	}
+	var width = 750,
+		height = 1681;
+	var scale = 1;
+	var distance = 500; // 生成间隔时间
+	var waitTime = 200; // up后等待时间
+	var managerCreateNum = 1; // 每次性生成角色数量
 
 	var roleType = [{
 		id: 0,
@@ -20,18 +20,6 @@ var game = (function() {
 		score: -10
 	}];
 
-	var width = 750,
-		height = 1681;
-	var asset = null,
-		stage = null,
-		ticker = null,
-		state = stateType.DEFAULT;
-	var scale = 1;
-	var roleList = [];
-	var progressNum = 0;
-	var loadDom = null;
-	var distance = 300;
-	var managerCreateNum = 1;
 	var posList = [{
 			x: 75,
 			y: 360
@@ -64,10 +52,21 @@ var game = (function() {
 		}
 	];
 
-	var callback = {
-		hit: function() {},
-		end: function() {}
+	var stateType = {
+		DEFAULT: "default",
+		READY: "ready",
+		START: "start",
+		OVER: "over"
 	}
+
+	var _event = Hilo.EventMixin;
+	var state = stateType.DEFAULT;
+	var asset = null,
+		stage = null,
+		ticker = null;
+	var roleList = [];
+	var progressNum = 0;
+	var loadDom = null;
 
 	var init = function(args) {
 		if(args && args.width) width = args.width;
@@ -227,19 +226,22 @@ var game = (function() {
 		role.play();
 		role.state = "up";
 		role.positionIndex = index;
-		role.on("touchstart", function(e) {
+		role.on(Hilo.event.POINTER_START, function(e) {
 			if(this.state !== "up") return;
 			this.goto("hit", false);
 			this.play();
 			this.off("touchstart");
-			callback.hit(type,this);
+			_event.fire("hit", {
+				type: type,
+				obj: this
+			})
 		});
 
 		role.setFrameCallback(5, function() {
 			setTimeout(function() {
 				this.goto("down", false);
 				this.play();
-			}.bind(this), 200);
+			}.bind(this), waitTime);
 		})
 
 		role.setFrameCallback(9, function() {
@@ -256,17 +258,17 @@ var game = (function() {
 	}
 
 	function removeChild(role, rolePostion) {
-		
+
 		stage.children.forEach(function(item, index) {
-			if(item instanceof Hilo.Sprite){
+			if(item instanceof Hilo.Sprite) {
 				if(item.id == role.id) {
-				   stage.children.splice(index, 1);
-			   }
+					stage.children.splice(index, 1);
+				}
 			}
 		});
 		roleList.length = 0;
 		stage.children.forEach(function(item, index) {
-			if(item instanceof Hilo.Sprite){
+			if(item instanceof Hilo.Sprite) {
 				roleList.push(item.positionIndex);
 			}
 		});
@@ -318,7 +320,7 @@ var game = (function() {
 
 	function onGameStateOver() {
 		if(state !== stateType.OVER) return;
-		callback.end()
+		_event.fire("end");
 	}
 
 	return {
@@ -326,7 +328,7 @@ var game = (function() {
 		play: playGame,
 		stop: stopGame,
 		replay: replayGame,
-		callback: callback
+		on: _event.on.bind(_event)
 	};
 })();
 

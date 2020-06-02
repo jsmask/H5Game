@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html>
+
 	<head>
 		<meta charset="utf-8" />
-		<title></title>
+		<title>打地鼠</title>
 		<meta name="Keywords" content="">
 		<meta name="description" content="">
 		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1, user-scalable=no">
@@ -24,49 +25,54 @@
 		<link rel="stylesheet" type="text/css" href="css/mk-loader.css" />
 		<link rel="stylesheet" type="text/css" href="css/lottery.css" />
 		<style type="text/css">
-			#game-container canvas{
+			#game-container canvas {
 				position: relative !important;
 				vertical-align: middle;
 			}
 		</style>
 	</head>
+
 	<body>
-			<div id="mk-wait">
-				<div data-loader="circle"></div>
-			</div>
-			<div id="mk-main">
-				<div id="game-container" ref="container"></div>
-			</div>	
-		
-			<script src="js/mui.min.js" type="text/javascript" charset="utf-8"></script>
-			<script src="js/mk.js" type="text/javascript" charset="utf-8"></script>
-			<script src="js/hilo-standalone.min.js"></script>
+		<div id="mk-wait">
+			<div data-loader="circle"></div>
+		</div>
+		<div id="mk-main">
+			<div id="game-container" ref="container"></div>
+		</div>
 
-			<script src="js/gopher/main.js" type="text/javascript" charset="utf-8"></script>
-			<script src="js/gopher/asset.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/mui.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/mk.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/hilo-standalone.min.js"></script>
+		<script src="js/gopher/main.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/gopher/asset.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/vue.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/bscroll.min.js" type="text/javascript" charset="utf-8"></script>
 
-			<script type="text/javascript">
-				;(function() {
-					mk.init();
+		<script type="text/javascript">
+			;
+			(function() {
+				mk.init();
+				game.init();
+				game.play();
 
-					game.init();
-					game.play();
-					game.callback.hit = function(e){
-						console.log(e);
-					}
-					game.callback.end = function(){
-						console.log("游戏结束");
-					}
-					
-//                  var time = 5;
-//					var timer = setInterval(function(){
-//						if(time<=0){
-//							game.stop();
-//						}
-//						-- time;
-//					},1000)
-					
-				})();
-			</script>
+				game.on("end", function() {
+					console.log("游戏结束")
+				});
+
+				game.on("hit", function(e) {
+					console.log(e.detail)
+				});
+
+				//                  var time = 5;
+				//					var timer = setInterval(function(){
+				//						if(time<=0){
+				//							game.stop();
+				//						}
+				//						-- time;
+				//					},1000)
+
+			})();
+		</script>
 	</body>
+
 </html>
