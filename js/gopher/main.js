@@ -7,7 +7,8 @@ var game = (function() {
 
 	var width = 750,
 		height = 1681;
-	var scale = 1;
+	var scale = 1; // 场景缩放值
+	var roleScale = 2; // 角色缩放值
 	var distance = 500; // 生成间隔时间
 	var waitTime = 200; // up后等待时间
 	var managerCreateNum = 1; // 每次性生成角色数量
@@ -146,7 +147,7 @@ var game = (function() {
 
 	function replayGame() {
 		state = stateType.READY;
-		playGame()
+		playGame();
 	}
 
 	function createLoadDom() {
@@ -203,8 +204,8 @@ var game = (function() {
 		var role = new Hilo.Sprite({
 			x: pos.x,
 			y: pos.y,
-			scaleX: 2,
-			scaleY: 2,
+			scaleX: roleScale,
+			scaleY: roleScale,
 			loop: false,
 			paused: true,
 			frames: Hilo.TextureAtlas.createSpriteFrames([
@@ -223,7 +224,7 @@ var game = (function() {
 		role.play();
 		role.state = "up";
 		role.positionIndex = index;
-		
+
 		role.on(Hilo.event.POINTER_START, function(e) {
 			if(this.state !== "up") return;
 			this.goto("hit", false);
@@ -256,7 +257,6 @@ var game = (function() {
 	}
 
 	function removeChild(role, rolePostion) {
-
 		stage.children.forEach(function(item, index) {
 			if(item instanceof Hilo.Sprite) {
 				if(item.id == role.id) {
@@ -321,6 +321,13 @@ var game = (function() {
 		_event.fire("end");
 	}
 
+	window.requestAnimFrame = (function() {
+		return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame ||
+			function(callback, element) {
+				return window.setTimeout(callback, 1000 / 60);
+			};
+	})();
+
 	return {
 		init: init,
 		play: playGame,
@@ -328,11 +335,4 @@ var game = (function() {
 		replay: replayGame,
 		on: _event.on.bind(_event)
 	};
-})();
-
-window.requestAnimFrame = (function() {
-	return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame ||
-		function(callback, element) {
-			return window.setTimeout(callback, 1000 / 60);
-		};
 })();
