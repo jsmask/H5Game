@@ -51,29 +51,28 @@
 		<script src="js/bscroll.min.js" type="text/javascript" charset="utf-8"></script> -->
 
 		<script type="text/javascript">
-			;
-			(function() {
+			;(function() {
 				mk.init();
 				game.init();
 				game.play();
-
+				
 				//game.replay();
 
-				game.on("end", function() {
+				game.on(game.EventType.END, function() {
 					console.log("游戏结束")
 				});
 
-				game.on("hit", function(e) {
+				game.on(game.EventType.HIT, function(e) {
 					console.log(e.detail)
 				});
 
-				//                  var time = 5;
-				//					var timer = setInterval(function(){
-				//						if(time<=0){
-				//							game.stop();
-				//						}
-				//						-- time;
-				//					},1000)
+//            	var time = 5;
+//				var timer = setInterval(function(){
+//					if(time<=0){
+//						game.stop();
+//					}
+//					-- time;
+//				},1000)
 
 			})();
 		</script>

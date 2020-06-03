@@ -52,7 +52,13 @@ var game = (function() {
 			y: 898
 		}
 	];
-
+	
+	
+	var eventType = {
+		HIT:"hit",
+		END:"end"
+	}
+	
 	var stateType = {
 		DEFAULT: "default",
 		READY: "ready",
@@ -230,7 +236,7 @@ var game = (function() {
 			this.goto("hit", false);
 			this.play();
 			this.off(Hilo.event.POINTER_START);
-			_event.fire("hit", {
+			_event.fire(eventType.HIT, {
 				type: type,
 				obj: this
 			})
@@ -318,7 +324,7 @@ var game = (function() {
 
 	function onGameStateOver() {
 		if(state !== stateType.OVER) return;
-		_event.fire("end");
+		_event.fire(eventType.END);
 	}
 
 	window.requestAnimFrame = (function() {
@@ -329,6 +335,7 @@ var game = (function() {
 	})();
 
 	return {
+		EventType:eventType,
 		init: init,
 		play: playGame,
 		stop: stopGame,
