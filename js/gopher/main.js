@@ -167,9 +167,6 @@ var game = (function() {
 
 	function initBackground() {
 		//背景
-		var bgWidth = this.width * this.scale;
-		var bgHeight = this.height * this.scale;
-
 		var bgImg = asset["bg_0"];
 
 		this.bg = new Hilo.Bitmap({
