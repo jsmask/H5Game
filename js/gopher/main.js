@@ -226,11 +226,12 @@ var game = (function() {
 		role.play();
 		role.state = "up";
 		role.positionIndex = index;
+		
 		role.on(Hilo.event.POINTER_START, function(e) {
 			if(this.state !== "up") return;
 			this.goto("hit", false);
 			this.play();
-			this.off("touchstart");
+			this.off(Hilo.event.POINTER_START);
 			_event.fire("hit", {
 				type: type,
 				obj: this
