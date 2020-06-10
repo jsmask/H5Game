@@ -6,59 +6,17 @@
 var game = (function() {
 
 	var width = 750,
-		height = 1681;
+		height = 1206;
 	var scale = 1; // 场景缩放值
-	var roleScale = 2; // 角色缩放值
-	var distance = 500; // 生成间隔时间
-	var waitTime = 200; // up后等待时间
+	var roleScale = 1; // 角色缩放值
+	var distance = 350; // 生成间隔时间
 	var managerCreateNum = 1; // 每次性生成角色数量
 
-	var roleType = [{
-		id: 0,
-		score: 10
-	}, {
-		id: 1,
-		score: -10
-	}];
-
-	var posList = [{
-			x: 75,
-			y: 360
-		}, {
-			x: 290,
-			y: 310
-		}, {
-			x: 485,
-			y: 380
-		},
-		{
-			x: 75,
-			y: 580
-		}, {
-			x: 290,
-			y: 535
-		}, {
-			x: 485,
-			y: 600
-		},
-		{
-			x: 70,
-			y: 875
-		}, {
-			x: 285,
-			y: 825
-		}, {
-			x: 485,
-			y: 898
-		}
-	];
-	
-	
 	var eventType = {
-		HIT:"hit",
-		END:"end"
+		HIT: "hit",
+		END: "end"
 	}
-	
+
 	var stateType = {
 		DEFAULT: "default",
 		READY: "ready",
@@ -71,7 +29,7 @@ var game = (function() {
 	var asset = null,
 		stage = null,
 		ticker = null;
-	var roleList = [];
+	var packetList = [];
 	var progressNum = 0;
 	var loadDom = null;
 
@@ -174,7 +132,7 @@ var game = (function() {
 
 	function initBackground() {
 		//背景
-		var bgImg = asset["bg_0"];
+		var bgImg = asset["bg"];
 
 		this.bg = new Hilo.Bitmap({
 			id: 'bg',
@@ -186,97 +144,60 @@ var game = (function() {
 
 	function roleManager() {
 		for(var i = 0; i < managerCreateNum; i++) {
-			var type = roleType[Math.floor(roleType.length * Math.random())];
-			var n = getRoleIndex();
-			if(n != -1) addRole(n, type);
-		}
+			addRole();
+		};
 	}
 
-	function getRoleIndex() {
-		var n = Math.floor(Math.random() * posList.length);
-		if(roleList.length === posList.length) return -1;
-		if(roleList.indexOf(n) === -1) return n;
-		return getRoleIndex();
-	}
-
-	var createRole = function(index, type) {
+	var createRedPacket = function() {
 		var rw = 108;
-		var rh = 101;
-		var pos = posList[index];
-		var _type = type || roleType[0];
-		var up = asset["role_" + _type.id + "_up"];
-		var hit = asset["role_" + _type.id + "_hit"];
-		var down = asset["role_" + _type.id + "_down"];
-		var role = new Hilo.Sprite({
-			x: pos.x,
-			y: pos.y,
+		var rh = 154;
+		var catimg = asset["catimg"];
+		var redpacket = new Hilo.Sprite({
+			x: width + Math.random() * width,
+			y: -150 - Math.random() * 200,
 			scaleX: roleScale,
 			scaleY: roleScale,
 			loop: false,
 			paused: true,
 			frames: Hilo.TextureAtlas.createSpriteFrames([
-				["up", "0-5", up, rw, rh, false, 5],
-				["hit", "0-3", hit, rw, rh, false, 7],
-				["down", "0-5", down, rw, rh, false, 2],
+				["normal", "0", catimg, rw, rh, false, 5],
+				["hit", "1", catimg, rw, rh, false, 5]
 			])
 		}).addTo(stage);
-		return role;
+		return redpacket;
 	};
 
 	function addRole(index, type) {
-		var role = createRole(index, type);
-		roleList.push(index);
-		role.goto("up", false);
-		role.play();
-		role.state = "up";
-		role.positionIndex = index;
-		role.tag = "gopher";
+		var redpacket = createRedPacket();
+		packetList.push(redpacket);
+		redpacket.rotation = 30;
+		redpacket.vx = -3 - (6 * Math.random());
+		redpacket.vy = 3 + (3 * Math.random());
+		redpacket.g = 0.05;
+		redpacket.tag = "redpacket";
+		redpacket.status = "normal";
 
-		role.on(Hilo.event.POINTER_START, function(e) {
-			if(this.state !== "up" || state == stateType.OVER) return;
+		redpacket.on(Hilo.event.POINTER_START, function(e) {
+			if(redpacket.status == "hit" || state == stateType.OVER) return;
+			redpacket.status = "hit";
 			this.goto("hit", false);
 			this.play();
 			this.off(Hilo.event.POINTER_START);
 			_event.fire(eventType.HIT, {
-				type: type,
-				obj: this
+				type: 1
 			})
-		});
-
-		role.setFrameCallback(5, function() {
-			setTimeout(function() {
-				this.goto("down", false);
-				this.play();
-			}.bind(this), waitTime);
-		})
-
-		role.setFrameCallback(9, function() {
-			this.goto("down", false);
-			this.play();
-			this.state = "hit";
-		})
-
-		role.setFrameCallback(15, function() {
-			var _this = this;
-			this.state = "down";
-			removeChild(_this, index);
 		});
 	}
 
-	function removeChild(role, rolePostion) {
-		stage.children.forEach(function(item, index) {
-			if(item instanceof Hilo.Sprite) {
-				if(item.id == role.id) {
-					stage.removeChild(item);
+	function removeChild() {
+		for(var i = packetList.length - 1; i >= 0; i--) {
+			if(packetList[i].y >= height + packetList[i].height) {
+				if(packetList[i].parent) {
+					packetList[i].parent.removeChild(packetList[i]);
 				}
+				packetList.splice(i, 1)
 			}
-		});
-		roleList.length = 0;
-		stage.children.forEach(function(item, index) {
-			if(item instanceof Hilo.Sprite && item.tag == "gopher") {
-				roleList.push(item.positionIndex);
-			}
-		});
+		}
 	}
 
 	function playGame(beginDate) {
@@ -316,6 +237,12 @@ var game = (function() {
 		var beginDate = beginDate || new Date(),
 			lastDate;
 		lastDate = new Date();
+		packetList.forEach(function(packet) {
+			packet.vy += packet.g;
+			packet.x += packet.vx;
+			packet.y += packet.vy;
+		});
+		removeChild();
 		if(lastDate - beginDate > distance) {
 			roleManager();
 			beginDate = lastDate;
@@ -326,6 +253,12 @@ var game = (function() {
 	function onGameStateOver() {
 		if(state !== stateType.OVER) return;
 		_event.fire(eventType.END);
+		for(var i = packetList.length - 1; i >= 0; i--) {
+			if(packetList[i].parent) {
+				packetList[i].parent.removeChild(packetList[i]);
+			}
+			packetList.splice(i, 1)
+		}
 	}
 
 	window.requestAnimFrame = (function() {
@@ -336,7 +269,7 @@ var game = (function() {
 	})();
 
 	return {
-		EventType:eventType,
+		EventType: eventType,
 		init: init,
 		play: playGame,
 		stop: stopGame,
