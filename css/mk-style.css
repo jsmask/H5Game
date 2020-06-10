@@ -244,25 +244,25 @@ input[type=submit]:enabled:active {
 	background-color: #F8F8F8;
 	border-top: solid 1px #ccc;
 	box-shadow: 0px -5px 7px 0px rgba(0, 0, 0, 0.1);
-	-webkit-transition: .3s;
+	transition: .3s;
 	bottom: 0px;
-	-webkit-transform: translateY(300px);
+	transform: translateY(300px);
 }
 
 .mui-poppicker.mui-active {
-	-webkit-transform: translateY(0px);
+	transform: translateY(0px);
 }
 
 .mui-android-5-1 .mui-poppicker {
 	bottom: -300px;
-	-webkit-transition-property: bottom;
-	-webkit-transform: none;
+	transition-property: bottom;
+	transform: none;
 }
 
 .mui-android-5-1 .mui-poppicker.mui-active {
 	bottom: 0px;
-	-webkit-transition-property: bottom;
-	-webkit-transform: none;
+	transition-property: bottom;
+	transform: none;
 }
 
 .mui-poppicker-header {
